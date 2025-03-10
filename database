@@ -1,0 +1,209 @@
+DROP TABLE IF EXISTS member, member_group ,interest_group CASCADE;
+
+CREATE TABLE member(
+	member_id serial NOT NULL,
+	member_number int NOT NULL,
+	first_name varchar(20) NOT NULL, 
+	last_name varchar(20) NOT NULL,
+	email_address varchar(50) NOT NULL,
+	phone_number varchar(20) NULL,
+	birthday date NOT NULL,
+	email_reminder boolean NOT NULL,
+	CONSTRAINT pk_id PRIMARY KEY(member_id)
+	);
+	
+CREATE TABLE interest_group(
+	group_id serial,
+	name varchar(20),
+	group_number int,
+	CONSTRAINT pk_interest_group PRIMARY KEY (group_id)
+	);
+	
+CREATE TABLE member_group(
+	member_id int NOT NULL,
+	group_id int NOT NULL,
+	CONSTRAINT pk_member_group PRIMARY KEY (member_id, group_id),
+	CONSTRAINT fk_member_group_member FOREIGN KEY (member_id) REFERENCES member(member_id),
+	CONSTRAINT fk_member_group_interest_group FOREIGN KEY (group_id) REFERENCES interest_group(group_id)
+	);
+	
+CREATE TABLE event(
+	event_id serial,
+	event_name varchar(20),
+	event_number int NOT NULL,
+	description text NOT NULL,
+	start_datetime timestamp NOT NULL,
+	duration int,
+	leading_group int,
+	CONSTRAINT pk_event PRIMARY KEY(event_id),
+	CONSTRAINT fk_event_interest_group FOREIGN KEY(leading_group) REFERENCES interest_group(group_id)
+	);
+
+CREATE TABLE member_event(
+	member_id int, 
+	event_id int,
+	CONSTRAINT pk_member_event PRIMARY KEY (member_id, event_id),
+	CONSTRAINT fk_member_event_member FOREIGN KEY (member_id) REFERENCES member (member_id),
+	CONSTRAINT fk_member_event_event FOREIGN KEY (event_id) REFERENCES event (event_id)
+	);
+-------- -------- ------- ---- MEMBER TABLE CODE BELOW ----- ------ ------ ------- -------- -----------	
+INSERT INTO 
+	member(member_number,first_name, last_name, email_address, phone_number, birthday, email_reminder)
+VALUES (
+	10171, 'Arya', 'Stark', 'agirlhasnoname@winterfell.com', '123-456-7890', '1997-10-12', 'false');
+INSERT INTO 
+	member(member_number,first_name,last_name,email_address, phone_number,birthday, email_reminder)
+VALUES (
+	10172, 'Sansa', 'Stark', 'ahaterofdaenerys@winterfell.com', '120-456-7894', '1994-10-13', 'true');
+INSERT INTO 
+	member(member_number,first_name, last_name, email_address, phone_number, birthday, email_reminder)
+VALUES (
+	10173, 'Jon', 'Snow', 'whatwasthepoint@winterfell.com', '129-455-7891', '1987-01-01', 'false');
+INSERT INTO 
+	member(member_number,first_name, last_name, email_address, phone_number, birthday, email_reminder)
+VALUES (
+	10174, 'Daenerys', 'Targaryen', 'themotherofdragons@rightfulheir.com', '111-111-1111', '1987-04-11', 'false');
+INSERT INTO 
+	member(member_number,first_name, last_name, email_address, phone_number, birthday, email_reminder)
+VALUES (
+	10175, 'Rhaenyra', 'Targaryen', 'therealmsdelight@rightfulheir.com', '777-777-7777', '1927-02-20', 'true');
+INSERT INTO 
+	member(member_number,first_name, last_name, email_address, phone_number, birthday, email_reminder)
+VALUES (
+	10176, 'Rhaneys', 'Targaryen', 'thequeenwhoneverwas@rightfulheir.com', '129-455-7891', '1917-07-01', 'false');
+INSERT INTO 
+	member(member_number,first_name, last_name, email_address, phone_number, birthday, email_reminder)
+VALUES (
+	10177, 'Meleys', 'Dragon', 'theredqueen@dragonstone.com', '127-457-0890', '1807-04-17', 'false');
+INSERT INTO 
+	member(member_number,first_name, last_name, email_address, phone_number, birthday, email_reminder)
+VALUES (
+	10178, 'Visenya', 'Targaryen', 'thewarriorqueen@aegonconquest.com', '129-455-7891', '1400-01-01', 'true');
+INSERT INTO 
+	member(member_number,first_name, last_name, email_address, phone_number, birthday, email_reminder)
+VALUES (
+	10179, 'Daemon', 'Targaryen', 'aegonfanboy@aegon1fan.com', null, '1917-11-14', 'false');
+INSERT INTO 
+	member(member_number,first_name, last_name, email_address, phone_number, birthday, email_reminder)
+VALUES (
+	10180, 'Cersie', 'Lannister', 'theworstqueen@theworse.com', null, '1917-11-14', 'false');
+----  ------- -------- INTEREST_GROUP TABLE CODE BELOW -------- -------- -------- ------- -------- -------- ---------
+INSERT INTO 
+	interest_group(name, group_number)
+VALUES (
+	'Targaryen Dynasty', 1);
+INSERT INTO 
+	interest_group(name, group_number)
+VALUES (
+	'Stark Dynasty', 2);
+INSERT INTO 
+	interest_group(name, group_number)
+VALUES (
+	'Daenerys Haters', 3);
+INSERT INTO 
+	interest_group(name, group_number)
+VALUES (
+	'A Dance of Dragons', 4);
+INSERT INTO 
+	interest_group(name, group_number)
+VALUES (
+	'Played The Game', 5);
+INSERT INTO 
+	interest_group(name, group_number)
+VALUES (
+	'Won The Game', 6);
+-------------------------- MEMBER_GROUP TABLE CODE BELOW -------------------------------------
+INSERT INTO 
+	member_group(member_id, group_id)
+VALUES
+	(4,1), (5,1), (6,1),(7,1),(8,1), (9,1);
+INSERT INTO 
+	member_group(member_id, group_id)
+VALUES
+	(1,2), (2,2), (3,2);
+INSERT INTO 
+	member_group(member_id, group_id)
+VALUES
+	(2,3), (10,3);
+INSERT INTO 
+	member_group(member_id, group_id)
+VALUES
+	(7,4);
+INSERT INTO 
+	member_group(member_id, group_id)
+VALUES
+	(4,5),(2,5),(10,5);
+SELECT * FROM member, interest_group;
+---------------------- Group Member Name Code -------------------------------------
+SELECT
+	ig.name AS group_name,
+	m.first_name || ' ' || m.last_name AS member_name
+FROM
+	interest_group ig
+LEFT JOIN 
+	member_group mg ON ig.group_id = mg.group_id
+LEFT JOIN
+	member m ON mg.member_id = m.member_id
+ORDER BY
+	ig.group_id, member_name;
+----------------------- EVENT TABLE CODE BELOW -------------------------------------
+INSERT INTO
+	event(
+		event_name, description,
+		event_number, start_datetime,
+	 	duration, leading_group)
+VALUES
+	('Battle of Winterfell', 'Dragons, Northmen and Wildlings against The Night King.', 287, '2019-04-28 22:00:00', 201, 2
+	);
+INSERT INTO
+	event(
+		event_name,description ,
+		event_number, start_datetime,
+	 	duration,leading_group)
+VALUES
+	('Battle of Rooks Nest', 'The Red Queen and The Queen Who Never Was dominate the battle field', 200, '1890-10-21 14:30:00', 280, 1
+	);
+INSERT INTO
+	event(
+		event_name,description ,
+		event_number, start_datetime,
+	 	duration,leading_group)
+VALUES
+	('Haters of The Realm', 'The bitter Queens try to Plan Daenerys Demise', 3, '2018-10-31 23:30:00', 60, 3
+	);
+INSERT INTO
+	event(
+		event_name,description ,
+		event_number, start_datetime,
+	 	duration)
+VALUES
+	('Winners Circle', 'The Realms Protector hosts a feast to celebrate.', 5, '2019-05-15 13:50:00', 90
+	);
+----------------------- MEMBEREVENT TABLE CODE BELOW -------------------------------------
+INSERT INTO
+	member_event(member_id, event_id)
+VALUES
+	(3,1), (2,1), (1,1),(4,1);
+INSERT INTO
+	member_event(member_id, event_id)
+VALUES
+	(4,2), (5,2), (6,2),(7,2),(8,2),(9,2);
+INSERT INTO
+	member_event(member_id, event_id)
+VALUES
+	(2,3), (10,3);
+INSERT INTO
+	member_event(member_id, event_id)
+VALUES
+	(4,4);
+-------------------------CODE FOR ALL MEMBERS AND EVENTS----------------------------------
+SELECT
+	e.event_id, e.event_name, e.description,
+	e.start_datetime, e.duration, m.member_id,
+	m.first_name, m.last_name
+FROM
+	member_event me
+LEFT JOIN
+	event e ON me.event_id = e.event_id
+LEFT JOIN
+	member m ON me.member_id = m.member_id;
